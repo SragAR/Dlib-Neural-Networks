@@ -26,17 +26,21 @@ int main(int argc, char **argv)
         my_relu_net_type relu_net;
         using my_max_pool_type = max_pool<2,2,2,2,input<array2d<rgb_pixel>>>;
         my_max_pool_type max_pool_net;
-        array2d<rgb_pixel> img_mine, out_img_mine;
+        using fully_connected_type = fc_no_bias<128,input<array2d<rgb_pixel>>>;
+        fully_connected_type full_net;
+
+        using mock_resnet_type = con<32,7,7,2,2,input<array2d<rgb_pixel>>>;
+        mock_resnet_type mock_resnet;
+
+        array2d<rgb_pixel> img_mine,out_img;
         load_image(img_mine, argv[1]);
-        cout<<"Net details"<<relu_net(img_mine).nr()<<" "<<relu_net(img_mine).nc();
-        image_window my_window(mat(relu_net(img_mine),150,150 ), "Convolved Image");
         long n_rows, n_columns;
-        n_rows = max_pool_net(img_mine).nr();
-        n_columns = max_pool_net(img_mine).nc();
-        cout<<"Maxpool  details"<<max_pool_net(img_mine).nr()<<" "<<max_pool_net(img_mine).nc();
-        image_window my_window2(mat(max_pool_net(img_mine),n_rows,n_columns), "MaxPool Image");
+        resizable_tensor resnet_output;
+        resnet_output = mock_resnet(img_mine);
+        n_rows = resnet_output.nr();
+        n_columns = resnet_output.nc();
+        image_window my_window2(mat(resnet_output,n_rows,n_columns), "Resnet Output");
         image_window my_window1(mat(img_mine), "Original Image");
-        my_window.wait_until_closed();
         my_window1.wait_until_closed();
         my_window2.wait_until_closed();
 
